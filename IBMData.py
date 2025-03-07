@@ -14,9 +14,8 @@ def getTrainingData():
     original_df = pd.DataFrame(original_data_dict)
 
     original_df.drop("Meta Data", axis="columns", inplace=True)
-    original_df.drop(['1. Information', '2. Symbol', '3. Last Refreshed', '4. Output Size', '5. Time Zone', ],
-                     axis=0,
-                     inplace=True)
+    original_df.drop(['1. Information', '2. Symbol', '3. Last Refreshed', '4. Output Size', '5. Time Zone', ], axis=0, inplace=True)
+
 
     new_df, target_df, scaler, old_df = ReformatData(original_df)
 
@@ -40,11 +39,18 @@ def ReformatData(df):
     scaler = MinMaxScaler(feature_range=(0, 1))
 
 
-    for col in new_df.columns:
-        new_df[col] = scaler.fit_transform(new_df[[col]])
+    # for col in new_df.columns:
+    #     new_df[col] = scaler.fit_transform(new_df[[col]])
+    new_df[['open', 'high', 'low', 'close']] = scaler.fit_transform(new_df[['open', 'high', 'low', 'close']])
+
+    new_df[['volume']] = scaler.fit_transform(new_df[['volume']])
 
 
-    new_df = scaler.fit_transform(new_df) #Inefficient yes, but converts the panda dataframe into a numpy array. DOESN'T AFFECT THE DATA! Change when you get the chance
+
+    new_df = scaler.fit_transform(new_df) #Inefficient yes, but converts the panda dataframe into a numpy array. DOESN'T AFFECT THE DATA! Tried changing, messes up algorithm
+
+
+    #new_nparray = new_df.to_numpy()
 
 
     return new_df, target_df, scaler, old_df
@@ -54,9 +60,13 @@ def SeparateTrainingTesting(df, target_df, n, scaler, old_df):
     training_data = df[n:, :]
     testing_data = df[:n, :]
 
+    print(target_df[n:])
+    print('\n')
+    print(target_df[:n])
 
 
-    return df, training_data, testing_data, target_df[n:], target_df[n:len(target_df)], old_df.astype(float), scaler, n
+
+    return df, training_data, testing_data, target_df[n:], old_df.astype(float), scaler, n
 
 
 def getEndOfYearIndex(df):

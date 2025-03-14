@@ -1,11 +1,9 @@
-import numpy as np
-
 from IBMData import *
 import tensorflow as tf
 from keras import *
 from keras.layers import *
 import matplotlib.pyplot as plt
-
+from sklearn.metrics import mean_squared_error
 
 def main():
     scaled_data, train_data, test_data, target_train, old_df, scaler, n = getTrainingData()
@@ -49,8 +47,11 @@ def main():
     train_unscaled = np.hstack(old_df.iloc[n:, -1])
     test_unscaled = np.hstack(old_df.iloc[:n, -1])
 
-    train_score = np.mean(np.abs(train_predict - train_unscaled))
-    test_score = np.mean(np.abs(test_predict - test_unscaled))
+    # train_score = np.mean(np.abs(train_predict - train_unscaled))
+    # test_score = np.mean(np.abs(test_predict - test_unscaled))
+
+    train_score = np.sqrt(mean_squared_error(train_unscaled, train_predict))
+    test_score = np.sqrt(mean_squared_error(test_unscaled, test_predict))
 
     print(f'Train Score: {train_score:.2f} RMSE')
     print(f'Test Score: {test_score:.2f} RMSE')
